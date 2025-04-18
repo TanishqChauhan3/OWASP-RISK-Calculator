@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OWASP Risk Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.1/dist/chart.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/owasp_risk.css">
+    <script type="text/javascript" src="js/owasp_script.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .hero-section {
+            background: url('images/cybersecurity.jpg') no-repeat center center/cover;
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+        }
+        
+        .navbar {
+            margin-bottom: 2rem;
+        }
+        .topics {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        .btn-link {
+            font-size: 1.5rem;
+        }
+        .score-button {
+            font-size: 2rem;
+            padding: 1rem 3rem;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        h1 {
+            color: rgb(103, 28, 28);
+        }
+        p {
+            color: rgb(103, 28, 28);
+        }
+    </style>
+</head>
+<body>
+    <header class="hero-section">
+        <div class="container">
+            <h1>OWASP Risk Calculator</h1>
+            <p>Calculate the risk levels based on OWASP guidelines</p>
+        </div>
+    </header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="index.html">
+            <img src="/Users/<your_user>/Documents/OWASP/husky.png" style="max-width: 2.5rem;">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        HUSKY GROUP 4
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item">Divya Musale</a>
+                        <a class="dropdown-item">Dimple Khandelwal</a>
+                        <a class="dropdown-item">Dnyanada Deo</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <canvas id="myChart" class="container"></canvas>
+        <div class="container text-center my-4">
+            <button id="overall_score" class="btn btn-link score-button">0</button>
+        </div>
+        <div class="row">
+            <div class="col-md-6 topics">
+                <h2>Threat Agent Factors</h2>
+                <hr>
+                <div class="form-group row">
+                    <label for="sl" class="col-4 col-form-label">Skill Level</label>
+                    <div class="col-8">
+                        <select id="sl" class="form-control" onchange="calc_score()">
+                            <option value="1">No Technical Skills</option>
+                            <option value="3">Some Technical Skills</option>
+                            <option value="5">Advanced Computer User</option>
+                            <option value="6">Network And Programming Skills</option>
+                            <option value="9">Security Penetration Skills</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="motive" class="col-4 col-form-label">Motive</label>
+                    <div class="col-8">
+                        <select id="motive" class="form-control" onchange="calc_score()">
+                            <option value="1">Low Or No Reward</option>
+                            <option value="4">Possible Reward</option>
+                            <option value="9">High Reward</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="oppor" class="col-4 col-form-label">Opportunity</label>
+                    <div class="col-8">
+                        <select id="oppor" class="form-control" onchange="calc_score()">
+                            <option value="0">Full Access/Expensive Resources Required</option>
+                            <option value="4">Special Access Or Resources Required</option>
+                            <option value="7">Some Access Or Resources Required</option>
+                            <option value="9">No Access Or Resources Required</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="size" class="col-4 col-form-label">Size</label>
+                    <div class="col-8">
+                        <select id="size" class="form-control" onchange="calc_score()">
+                            <option value="2">Developers</option>
+                            <option value="2">System Administrators</option>
+                            <option value="4">Intranet Users</option>
+                            <option value="5">Partners</option>
+                            <option value="6">Authenticated Users</option>
+                            <option value="9">Anonymous Internet Users</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 topics">
+                <h2>Vulnerability Factors</h2>
+                <hr>
+                <div class="form-group row">
+                    <label for="eod" class="col-4 col-form-label">Ease of Discovery</label>
+                    <div class="col-8">
+                        <select id="eod" class="form-control" onchange="calc_score()">
+                            <option value="1">Practically impossible</option>
+                            <option value="3">Difficult</option>
+                            <option value="7">Easy</option>
+                            <option value="9">Automated Tools available</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="eoe" class="col-4 col-form-label">Ease of Exploit</label>
+                    <div class="col-8">
+                        <select id="eoe" class="form-control" onchange="calc_score()">
+                            <option value="1">Theoretical</option>
+                            <option value="3">Difficult</option>
+                            <option value="5">Easy</option>
+                            <option value="9">Automated Tools available</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="aware" class="col-4 col-form-label">Awareness</label>
+                    <div class="col-8">
+                        <select id="aware" class="form-control" onchange="calc_score()">
+                            <option value="1">Unknown</option>
+                            <option value="4">Hidden</option>
+                            <option value="6">Obvious</option>
+                            <option value="9">Public Knowledge</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="intrude" class="col-4 col-form-label">Intrusion Detection</label>
+                    <div class="col-8">
+                        <select id="intrude" class="form-control" onchange="calc_score()">
+                            <option value="1">Active Detection In Application</option>
+                            <option value="4">Logged And Reviewed</option>
+                            <option value="8">Logged Without Review</option>
+                            <option value="9">Not Logged</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container text-center my-4">
+            <h4>Likelihood Score</h4>
+            <button type="button" id="like_score" class="btn btn-link score-button">0</button>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 topics">
+                <h2>Technical Impact Factors</h2>
+                <hr>
+                <div class="form-group row">
+                    <label for="loc" class="col-5 col-form-label">Loss Of Confidentiality</label>
+                    <div class="col-7">
+                        <select id="loc" class="form-control" onchange="calc_score()">
+                            <option value="2">Minimal non-sensitive data disclosed</option>
+                            <option value="6">Minimal critical data disclosed</option>
+                            <option value="6">Extensive non-sensitive data disclosed</option>
+                            <option value="7">Extensive critical data disclosed</option>
+                            <option value="9">All Data Disclosed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="loi" class="col-5 col-form-label">Loss Of Integrity</label>
+                    <div class="col-7">
+                        <select id="loi" class="form-control" onchange="calc_score()">
+                            <option value="1">Minimal Slightly Corrupt Data</option>
+                            <option value="3">Minimal Seriously Corrupt Data</option>
+                            <option value="5">Extensive Slightly Corrupt Data</option>
+                            <option value="7">Extensive Seriously Corrupt Data</option>
+                            <option value="9">All Data Totally Corrupt</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="loa" class="col-5 col-form-label">Loss Of Availability</label>
+                    <div class="col-7">
+                        <select id="loa" class="form-control" onchange="calc_score()">
+                            <option value="1">Minimal Secondary Services Interrupted</option>
+                            <option value="5">Minimal Primary Services Interrupted</option>
+                            <option value="5">Extensive Secondary Services Interrupted</option>
+                            <option value="7">Extensive Primary Services Interrupted</option>
+                            <option value="9">All Services Completely Lost</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="loacc" class="col-5 col-form-label">Loss of Accountability</label>
+                    <div class="col-7">
+                        <select id="loacc" class="form-control" onchange="calc_score()">
+                            <option value="1">Fully Traceable</option>
+                            <option value="7">Possibly Traceable</option>
+                            <option value="9">Completely Anonymous</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 topics">
+                <h2>Businesses Impact Factors</h2>
+                <hr>
+                <div class="form-group row">
+                    <label for="finan" class="col-5 col-form-label">Financial Damage</label>
+                    <div class="col-7">
+                        <select id="finan" class="form-control" onchange="calc_score()">
+                            <option value="1">Less Than The Cost To Fix The Vulnerability</option>
+                            <option value="3">Minor Effect On Annual Profit</option>
+                            <option value="7">Significant Effect On Annual Profit</option>
+                            <option value="9">Bankruptcy</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="reput" class="col-5 col-form-label">Reputation Damage</label>
+                    <div class="col-7">
+                        <select id="reput" class="form-control" onchange="calc_score()">
+                            <option value="1">Minimal Damage</option>
+                            <option value="4">Loss Of Major Accounts</option>
+                            <option value="5">Loss Of Goodwill</option>
+                            <option value="9">Brand Damage</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="comply" class="col-5 col-form-label">Non-compliance</label>
+                    <div class="col-7">
+                        <select id="comply" class="form-control" onchange="calc_score()">
+                            <option value="2">Minor Violation</option>
+                            <option value="5">Clear Violation</option>
+                            <option value="7">High Profile Violation</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="privacy" class="col-5 col-form-label">Privacy Violation</label>
+                    <div class="col-7">
+                        <select id="privacy" class="form-control" onchange="calc_score()">
+                            <option value="3">One Individual</option>
+                            <option value="5">Hundreds Of People</option>
+                            <option value="7">Thousands Of People</option>
+                            <option value="9">Millions Of People</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container text-center my-4">
+            <h4>Impact Score</h4>
+            <button type="button" id="impact_score" class="btn btn-link score-button">0</button>
+        </div>
+    </div>
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Threat Agent', 'Vulnerability Factors', 'Technical Impact', 'Business Impact'],
+                datasets: [{
+                    label: 'Score',
+                    data: [],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        suggestedMin: 0,
+                        suggestedMax: 10
+                    }
+                }
+            }
+        });
+
+        function calc_score() {
+            var LS = 0;
+            var IS = 0;
+            var dataset = [];
+            var TA = parseInt(document.getElementById('sl').value) + 
+                    parseInt(document.getElementById('motive').value) + 
+                    parseInt(document.getElementById('oppor').value) + 
+                    parseInt(document.getElementById('size').value);
+            var VF = parseInt(document.getElementById('eod').value) + 
+                    parseInt(document.getElementById('eoe').value) + 
+                    parseInt(document.getElementById('aware').value) + 
+                    parseInt(document.getElementById('intrude').value);
+            LS = TA + VF;
+            TA = (TA / 4).toFixed(3);
+            dataset.push(TA);
+            VF = (VF / 4).toFixed(3);
+            dataset.push(VF);
+            LS = (LS / 8).toFixed(3);
+
+            var s1 = document.getElementById('like_score');
+            s1.innerHTML = LS;
+            if (LS < 3) {
+                s1.className = "btn btn-success score-button";
+            } else if (LS >= 3 && LS < 6) {
+                s1.className = "btn btn-warning score-button";
+            } else {
+                s1.className = "btn btn-danger score-button";
+            }
+
+            var TI = parseInt(document.getElementById('loc').value) + 
+                    parseInt(document.getElementById('loi').value) + 
+                    parseInt(document.getElementById('loa').value) + 
+                    parseInt(document.getElementById('loacc').value);
+            var BI = parseInt(document.getElementById('finan').value) + 
+                    parseInt(document.getElementById('reput').value) + 
+                    parseInt(document.getElementById('comply').value) + 
+                    parseInt(document.getElementById('privacy').value);
+
+            IS = TI + BI;
+            IS = (IS / 8).toFixed(3);
+            TI = (TI / 4).toFixed(3);
+            dataset.push(TI);
+            BI = (BI / 4).toFixed(3);
+            dataset.push(BI);
+
+            var s2 = document.getElementById('impact_score');
+            s2.innerHTML = IS;
+            if (IS < 3) {
+                s2.className = "btn btn-success score-button";
+            } else if (IS >= 3 && IS < 6) {
+                s2.className = "btn btn-warning score-button";
+            } else {
+                s2.className = "btn btn-danger score-button";
+            }
+
+            var matrix = [["Medium", "High", "Critical"], ["Low", "Medium", "High"], ["Note", "Low", "Medium"]];
+            var o_score = document.getElementById('overall_score');
+            var final_score = matrix[parseInt(LS)][parseInt(IS)];
+            o_score.innerHTML = final_score;
+            o_score.style.color = "black";
+            if (final_score == "Note") {
+                o_score.style.background = 'lightgreen';
+            } else if (final_score == "Low") {
+                o_score.style.background = "yellow";
+            } else if (final_score == "Medium") {
+                o_score.style.background = "orange";
+            } else if (final_score == "High") {
+                o_score.style.background = "red";
+            } else {
+                o_score.style.background = "pink";
+            }
+            updateChart(dataset);
+        }
+
+        function updateChart(dataset) {
+            myChart.data.datasets[0].data = dataset;
+            myChart.update();
+        }
+    </script>
+</body>
+</html>
